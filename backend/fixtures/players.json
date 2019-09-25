@@ -1,0 +1,28 @@
+[
+  {
+    "model": "backend.PlayerModel",
+    "pk": 1,
+    "fields": {
+      "name": "Test Name",
+      "ppr_position_tier": "1",
+      "ppr_flex_tier": "2",
+      "half_position_tier": "3",
+      "half_flex_tier": "4",
+      "standard_position_tier": "5",
+      "standard_flex_tier": "6"
+    }
+  },
+  {
+    "model": "backend.PlayerModel",
+    "pk": 2,
+    "fields": {
+      "name": "Test Name 2",
+      "ppr_position_tier": "11",
+      "ppr_flex_tier": "12",
+      "half_position_tier": "13",
+      "half_flex_tier": "14",
+      "standard_position_tier": "15",
+      "standard_flex_tier": "16"
+    }
+  }
+]
