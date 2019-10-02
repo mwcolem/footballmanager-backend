@@ -1,20 +1,27 @@
 from urllib.request import Request
 from urllib.request import urlopen
+import urllib.request
+import json
 from bs4 import BeautifulSoup
 from .constants import FORMAT
 from .models import PlayerModel
 from .player import Player
 
-RATINGS_URL = "https://fantasy.espn.com/football/team?leagueId=1172646&seasonId=2019&teamId=1&fromTeamId=1"
-S_G_URL = "https://fantasy.espn.com/football/team?leagueId=803723&teamId=1&seasonId=2019"
+# ALL PLAYERS http://fantasy.espn.com/apis/v3/games/ffl/seasons/2018/players?scoringPeriodId=0&view=players_wl
+# ALL FREE AGENTS http://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/336358?scoringPeriodId=0&view=kona_player_info
+# Pro League organization info https://site.web.api.espn.com/apis/site/v2/teams?region=us&lang=en&leagues=nfl%2Cnba%2Cmlb%2Cnhl
+# Pro team schedule http://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/?view=proTeamSchedules
+# Roster at a given week http://fantasy.espn.com/apis/v3/games/ffl/seasons/2018/segments/0/leagues/336358?forTeamId=9&scoringPeriodId=13&view=mRoster
+RATINGS_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/1172646?forTeamId=1&view=mRoster"
+S_G_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/803723?forTeamId=1&view=mRoster"
 DYNASTY_URL = "https://www.fleaflicker.com/nfl/leagues/195647/teams/1318827"
 RUGBY_URL = "https://fantasy.espn.com/football/team?leagueId=1259927&seasonId=2019&teamId=13&fromTeamId=13"
 PPR_LEAGUE_ESPN_URLS = [RATINGS_URL, S_G_URL]
 PPR_LEAGUE_FLEAFLICKER_URLS = [DYNASTY_URL]
 HALF_LEAGUE_URLS = [RUGBY_URL]
 STANDARD_LEAGUE_URLS = []
-
-LEAGUE_URLS = [RATINGS_URL, S_G_URL, DYNASTY_URL, RUGBY_URL]
+# ESPN_URLS = [RATINGS_URL, S_G_URL, RUGBY_URL]
+ESPN_URLS = [RATINGS_URL, S_G_URL]
 
 players = []
 
@@ -39,13 +46,24 @@ def get_soup(url):
 
 
 def get_player_list():
-    for url in LEAGUE_URLS:
-        print(url)
-        soup = get_soup(url)
-        player_list = soup.find_all('td', attrs={'class': 'playertablePlayerName'})
+    print(DYNASTY_URL)
+    soup = get_soup(DYNASTY_URL)
 
-        for row in player_list:
-            players.append(Player(str(row.find('a').getText())))
+    player_list = soup.find_all('div', attrs={'class': 'player-name'})
+
+    for row in player_list:
+        players.append(Player(str(row.find('a').getText())))
+
+    for espn_url in ESPN_URLS:
+        with urllib.request.urlopen(espn_url) as url:
+            print(espn_url)
+            data = json.loads(url.read().decode())
+
+            player_list = data['teams'][0]['roster']['entries']
+
+            for player in player_list:
+                print(player['playerPoolEntry']['player']['fullName'])
+                players.append(Player(player['playerPoolEntry']['player']['fullName']))
 
 
 def get_ppr_tiers():
@@ -211,6 +229,8 @@ def get_player(name):
 
 
 def update_players():
+    print("updating player list")
+
     get_player_list()
     get_tiers(FORMAT.PPR)
     map_players_to_tiers(FORMAT.PPR)
