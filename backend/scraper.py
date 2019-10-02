@@ -15,13 +15,12 @@ from .player import Player
 RATINGS_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/1172646?forTeamId=1&view=mRoster"
 S_G_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/803723?forTeamId=1&view=mRoster"
 DYNASTY_URL = "https://www.fleaflicker.com/nfl/leagues/195647/teams/1318827"
-RUGBY_URL = "https://fantasy.espn.com/football/team?leagueId=1259927&seasonId=2019&teamId=13&fromTeamId=13"
+RUGBY_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/1259927?forTeamId=13&view=mRoster"
 PPR_LEAGUE_ESPN_URLS = [RATINGS_URL, S_G_URL]
 PPR_LEAGUE_FLEAFLICKER_URLS = [DYNASTY_URL]
 HALF_LEAGUE_URLS = [RUGBY_URL]
 STANDARD_LEAGUE_URLS = []
-# ESPN_URLS = [RATINGS_URL, S_G_URL, RUGBY_URL]
-ESPN_URLS = [RATINGS_URL, S_G_URL]
+ESPN_URLS = [RATINGS_URL, S_G_URL, RUGBY_URL]
 
 players = []
 
