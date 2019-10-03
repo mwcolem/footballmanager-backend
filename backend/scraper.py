@@ -1,5 +1,6 @@
 from urllib.request import Request
 from urllib.request import urlopen
+from yahoo_oauth import OAuth2
 import urllib.request
 import json
 from bs4 import BeautifulSoup
@@ -16,11 +17,13 @@ RATINGS_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/
 S_G_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/803723?forTeamId=1&view=mRoster"
 DYNASTY_URL = "https://www.fleaflicker.com/nfl/leagues/195647/teams/1318827"
 RUGBY_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/1259927?forTeamId=13&view=mRoster"
+YAHOO_URL = "https://fantasysports.yahooapis.com/fantasy/v2/team/nfl.l.1166377.t.12/roster/players"
+PHI_DELT_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/667520?forTeamId=3&view=mRoster"
 PPR_LEAGUE_ESPN_URLS = [RATINGS_URL, S_G_URL]
 PPR_LEAGUE_FLEAFLICKER_URLS = [DYNASTY_URL]
 HALF_LEAGUE_URLS = [RUGBY_URL]
-STANDARD_LEAGUE_URLS = []
-ESPN_URLS = [RATINGS_URL, S_G_URL, RUGBY_URL]
+STANDARD_LEAGUE_URLS = [YAHOO_URL, PHI_DELT_URL]
+ESPN_URLS = [RATINGS_URL, S_G_URL]
 
 players = []
 
@@ -29,6 +32,13 @@ rb_tiers = []
 wr_tiers = []
 te_tiers = []
 flex_tiers = []
+
+
+def login_to_yahoo():
+    global oauth
+    oauth = OAuth2(None, None, from_file='./backend/oauth2yahoo.json')
+    if not oauth.token_is_valid():
+        oauth.refresh_access_token()
 
 
 def clear_tier_arrays():
@@ -63,6 +73,20 @@ def get_player_list():
             for player in player_list:
                 print(player['playerPoolEntry']['player']['fullName'])
                 players.append(Player(player['playerPoolEntry']['player']['fullName']))
+
+    login_to_yahoo()
+
+    print(YAHOO_URL)
+    response = oauth.session.get(YAHOO_URL, params={'format': 'json'})
+    data = response.json()
+
+    player_list = data['fantasy_content']['team'][1]['roster']['0']['players']
+    player_list.pop('count')
+
+    for player in player_list:
+        print(player_list[player]['player'][0][2]['name']['first']
+              + " "
+              + player_list[player]['player'][0][2]['name']['last'])
 
 
 def get_ppr_tiers():
