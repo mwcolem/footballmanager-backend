@@ -3,14 +3,11 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from urllib.request import Request
-from urllib.request import urlopen
 
 RATINGS_URL = "https://fantasy.espn.com/apis/v3/games/ffl/seasons/2019/segments/0/leagues/1172646?forTeamId=1&view=mMatchup"
 
 with urllib.request.urlopen(RATINGS_URL) as url:
     data = json.loads(url.read().decode())
-    # print(data)
 
 df = [[
     game['matchupPeriodId'],
@@ -19,8 +16,6 @@ df = [[
 ] for game in data['schedule']]
 
 df = pd.DataFrame(df, columns=['Week', 'Team1', 'Score1', 'Team2', 'Score2'])
-
-# print(df.loc[df['Week'] == 4])
 
 marginDf = df.assign(Margin1 = df['Score1'] - df['Score2'],
                      Margin2 = df['Score2'] - df['Score1'])
